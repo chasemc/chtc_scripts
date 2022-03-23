@@ -1,0 +1,24 @@
+# template.sub
+# starter submit file for CHTC jobs
+
+universe = vanilla
+log = logs/job_$(Cluster).log
+error = errors/job_$(Cluster)_$(Process).err
+output = outputs/job_$(Cluster)_$(Process).out
+
+executable = hmmsearch_cmd.sh
+arguments = $(hmm_model_basename) $(fasta_file_basename)
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = http://proxy.chtc.wisc.edu/SQUID/cmclark8/sg-env.tar.gz, http://proxy.chtc.wisc.edu/SQUID/cmclark8/hmm_models/$(hmm_model_basename).hmm.gz, fasta_for_chtc_50000/$(fasta_file_basename).zst
+
+request_cpus = 1
+request_memory = 1GB
+request_disk = 5GB
+max_idle = 100
+
++WantGlideIn = true
++WantFlocking = true
+
+queue hmm_model_basename fasta_file_basename from sample_matrix.csv
