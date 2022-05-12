@@ -14,3 +14,10 @@ Create the conda environment for distribution to nodes, using the script: `creat
 Check the size of the resulting tar.gz file, e.g. `ls -sh antismash.tar.gz`
 
 antiSMASH 6.1.1 resulted in a 4GB tar.gz (approx. 9GB decompressed) so it has to be placed in `staging`
+
+Make the scripts executable:
+
+```
+chmod +x antismash_main.sh
+chmod +x antismash_cmd.sh
+```
