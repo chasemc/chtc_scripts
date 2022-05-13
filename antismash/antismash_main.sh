@@ -21,30 +21,18 @@ tar -xzf antismash.tar.gz -C $ENVDIR
 rm antismash.tar.gz
 
 ./antismash_cmd.sh \
-    "${0}" \
+    "${1}" \
     --cpus 1 \
-    --cb-general \
-    --cc-mibig \
-    --cb-knownclusters \
-    --cb-subclusters \
-    --asf \
-    --pfam2go \
-    --rre \
-    --fullhmmer \
+    --genefinding-tool none \
     --output-dir antismash_results
 
 cd antismash_results
 
-tar -czvf "${0%.tar.gz}".tar.gz \
-    *region**.gbk \
-    knownclusterblastoutput.txt \
-    subclusterblastoutput.txt \
-    knownclusterblast/*.txt \
-    clusterblast/*.txt
+tar -czvf "${1%.tar.gz}".tar.gz *region**.gbk 
 
 cd ..
 
-mv ./antismash_results/"${0%.tar.gz}".tar.gz "${0%.tar.gz}".tar.gz
+mv ./antismash_results/"${1%.tar.gz}".tar.gz "${1%.tar.gz}".tar.gz
 
 # Before the script exits, make sure to remove the file(s) from the working directory
 rm -rf antismash
