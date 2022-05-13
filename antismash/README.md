@@ -16,7 +16,7 @@ sh Miniconda3-latest-Linux-x86_64.sh
 
 Install antismash and create a transferable environment using the commands in `create_conda_exe.sh`
 
-> Note: If building on CHTC: the final conda env is ~9GB before compression and the final file is approximately 4 GB compressed.
+> Note: If building on CHTC: the final conda env is ~9 GB before compression and the final file is approximately 4 GB compressed.
 
 # 2: Transfer to staging
 
