@@ -19,3 +19,4 @@ view current user priorities
 condor_userprio
 ```
 
+https://chtc.cs.wisc.edu/uw-research-computing/check-quota.html
