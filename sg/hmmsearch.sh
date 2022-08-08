@@ -3,21 +3,27 @@
 # have job exit if any command returns with non-zero exit status (aka failure)
 set -e
 
-#  $1 is the hmm profile; gzip file name with no extensions
-#  $2 is the protein fasta; gzip file name with no extensions
-HMM_INPUT_FILE=$1
-FASTA_INPUT_FILE=$2
-HMM_BASENAME=$(echo "$HMM_INPUT_FILE" | sed -e "s/.hmm.gz$//")
-FAA_BASENAME=$(echo "$FASTA_INPUT_FILE" | sed -e "s/.faa.gz$//")
 
+a=$1
+b=$2
+# replace env-name on the right hand side of this line with the name of your conda environment
 ENVNAME=sg_conda
+# if you need the environment directory to be named something other than the environment name, change this line
 ENVDIR=$ENVNAME
+
+# these lines handle setting up the environment; you shouldn't have to modify them
 export PATH
 mkdir $ENVDIR
 tar -xzf $ENVNAME.tar.gz -C $ENVDIR
 . $ENVDIR/bin/activate
 
 
+#  $1 is the hmm profile; gzip file name with no extensions
+#  $2 is the protein fasta; gzip file name with no extensions
+HMM_INPUT_FILE=$1
+FASTA_INPUT_FILE=$2
+HMM_BASENAME="${HMM_INPUT_FILE%.hmm.gz}"
+FAA_BASENAME="${FASTA_INPUT_FILE%.faa.gz}"
 
 zcat ${FASTA_INPUT_FILE} > input_fasta_file.faa
 
@@ -33,27 +39,13 @@ hmmsearch \
     --cpu 1 \
     --seed 42 \
     ${HMM_INPUT_FILE} \
-    input_fasta_file.faa 
+    input_fasta_file.faa > /dev/null 2>&1
     #-A "${outfilename}.align" \
     #--tblout "${outfilename}.tblout" \
 
-md5sum "${outfilename}.domtblout" > "${outfilename}.md5"
-#md5sum "${outfilename}.tblout" >> "${outfilename}.md5"
-#md5sum "${outfilename}.align" >> "${outfilename}.md5"
 
-# Compress the domtblout and alignment files,
-# use zstd and not gzip because faster and smaller for chtc
-gzip -6 --rsyncable  -9 --rm "${outfilename}.domtblout"
-#zstd -9 --rm "${outfilename}.tblout"
-#zstd -9 --rm "${outfilename}.align"
-
-# Now we create a tar of the files to transfer back on CHTC
-# Unnecessary for non-chtc but keeping so that, for now, the
-# python script that processes reusults can stay the same between
-# the two execution environments
-#tar -cvf "results_${outfilename}.tar" "${outfilename}.domtblout.zst" "${outfilename}.tblout.zst" "${outfilename}.align.zst" "${outfilename}.md5" --remove-files
-tar -cvf "${outfilename}.tar" "${outfilename}.domtblout.gz" "${outfilename}.md5" --remove-files
-
-# If on CHTC, move results to top dir so it will be sent back
-mv ${outfilename}.tar ../${outfilename}.tar
-
+# send files we don't want returned to nope
+mkdir nope
+mv input_fasta_file.faa nope/input_fasta_file.faa
+gzip -6 --rsyncable "${outfilename}.domtblout" 
+md5sum "${outfilename}.domtblout.gz" > "${outfilename}.md5"
